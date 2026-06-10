@@ -2,7 +2,7 @@ import SwiftUI
 import AVKit
 
 struct ContentView: View {
-    @StateObject private var hlsViewModel = HLSViewModel()
+    @ObservableObject private var hlsViewModel = HLSViewModel()
 
     var body: some View {
         VStack {
@@ -29,9 +29,9 @@ struct ContentView: View {
     }
 }
 
-class HLSViewModel: ObservableObject {
-    @Published var player: AVPlayer?
-    @Published var errorMessage: String?
+@Observable class HLSViewModel {
+    var player: AVPlayer?
+    var errorMessage: String?
 
     func loadStream(urlString: String) async {
         guard let url = URL(string: urlString) else {
@@ -43,13 +43,9 @@ class HLSViewModel: ObservableObject {
             // Simulate network check or preloading metadata (Async example)
             try await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
             
-            DispatchQueue.main.async {
-                self.player = AVPlayer(url: url)
-            }
+            self.player = AVPlayer(url: url)
         } catch {
-            DispatchQueue.main.async {
-                self.errorMessage = "Failed to load the stream."
-            }
+            self.errorMessage = "Failed to load the stream."
         }
     }
 
